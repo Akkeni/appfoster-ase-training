@@ -1,7 +1,7 @@
 
 function handleSplit() {
-/* handleSplit() function splits a number into number of times of another given nubmer and
- appends a div with respective widths.*/
+    /* handleSplit() function splits a number into number of times of another given nubmer and
+     appends a div with respective widths.*/
 
     var number1 = document.getElementById('number1').value;
     var number2 = document.getElementById('number2').value;
@@ -62,7 +62,7 @@ function handleSplit() {
     //Creates a new div element with width equal to array elements in reverse order.
     for (j = (array.length - 1); j >= 0; j--) {
         //console.log(j, array[j]);
-        if(color_count == 25){
+        if (color_count == 25) {
             color_count = 0;
         } else {
             color_count++;
@@ -77,12 +77,12 @@ function handleSplit() {
         result.appendChild(newdiv);
 
 
-       /* newdiv = `
-        <div class="addon" style="width: ${width}%; background-color: ${color_array[color_count]};">
-        ${array[j]}
-        </div>
-        `;
-        result.innerHTML += newdiv;*/
+        /* newdiv = `
+         <div class="addon" style="width: ${width}%; background-color: ${color_array[color_count]};">
+         ${array[j]}
+         </div>
+         `;
+         result.innerHTML += newdiv;*/
 
     }
 }
