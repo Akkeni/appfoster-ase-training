@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Project;
+use App\Models\Host;
 
 class ProjectController extends Controller
 {
@@ -14,9 +15,10 @@ class ProjectController extends Controller
      */
     public function index()
     {
-        $project = Project::all();
+        $projects = Project::paginate(5);
 
-        return response($project, 200);
+        return view('project.index', compact('projects'));
+
     }
 
     /**
@@ -24,9 +26,15 @@ class ProjectController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
-        return response()->json(['error' => 'Method Not Allowed'], 405);
+        $user_id = $request->get('user_id');
+
+        if ($user_id === null) {
+            $user_id = 'null';
+        }
+
+        return view('project.create', compact('user_id'));
     }
 
     /**
@@ -37,12 +45,19 @@ class ProjectController extends Controller
      */
     public function store(Request $request)
     {
+        $request->validate([
+            'user_id' => 'required',
+            'title' => 'required',
+            'description' => 'required'
+        ]);
+
         $project = new Project;
         $project->user_id = $request->get('user_id');
         $project->title = $request->get('title');
         $project->description = $request->get('description');
         $project->save();
-        return response()->json(['Created successfuly'], 200);
+
+        return to_route('projects.show', $project->user_id);
     }
 
     /**
@@ -53,7 +68,21 @@ class ProjectController extends Controller
      */
     public function show($id)
     {
-        return response()->json(['error' => 'Method Not Allowed'], 405);
+        if ($id == 'null') {
+            return to_route('projects.index');
+        }
+        $user = Host::find($id);
+        $user_id = $id;
+        $project_array = [];
+        if ($user === null) {
+            return response()->json(['error' => 'Not Found'], 404);
+        } else {
+            foreach ($user->projects as $project) {
+                array_push($project_array, $project);
+            }
+            //return response()->json($project_array);
+        }
+        return view('project.show', compact('project_array', 'user_id'));
     }
 
     /**
@@ -64,7 +93,8 @@ class ProjectController extends Controller
      */
     public function edit($id)
     {
-        return response()->json(['error' => 'Method Not Allowed'], 405);
+        $project = Project::find($id);
+        return view('project.edit', compact('project'));
 
     }
 
@@ -77,7 +107,19 @@ class ProjectController extends Controller
      */
     public function update(Request $request, $id)
     {
-        return response()->json(['error' => 'Method Not Allowed'], 405);
+        $request->validate([
+            'user_id' => 'required',
+            'title' => 'required',
+            'description' => 'required'
+        ]);
+
+        $project = Project::find($id);
+        $project->user_id = $request->get('user_id');
+        $project->title = $request->get('title');
+        $project->description = $request->get('description');
+        $project->save();
+
+        return to_route('projects.show', $project->user_id);
 
     }
 
@@ -87,13 +129,14 @@ class ProjectController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($project)
     {
+        list($id, $user_id) = explode('-', $project);
         $project = Project::find($id);
         if ($project === null) {
             return response(['error' => 'Not Found'], 404);
         }
         $project->delete();
-        return response(['Deleted Successfuly'], 200);
+        return to_route('projects.show', $user_id);
     }
 }

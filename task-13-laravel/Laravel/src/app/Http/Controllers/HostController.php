@@ -16,9 +16,10 @@ class HostController extends Controller
      */
     public function index()
     {
-        $host = Host::all();
+        $users = Host::paginate(5);
 
-        return response($host, 200);
+        return view('user.index', compact('users'))
+            ->with(request()->input('page'));
     }
 
     /**
@@ -28,13 +29,14 @@ class HostController extends Controller
      */
     public function create()
     {
+        return view('user.create');
         /*$host = new Host;
         $host->name = 'shankar';
         $host->email = 'shankar123@gmail.com';
         $host->gender = 'male';
         $host->save();
-        echo "Created successfuly";*/
-        return response()->json(['error' => 'Method Not Allowed'], 405);
+        echo "Created successfuly";
+        return response()->json(['error' => 'Method Not Allowed'], 405);*/
 
 
     }
@@ -47,12 +49,18 @@ class HostController extends Controller
      */
     public function store(Request $request)
     {
-        $host = new Host;
-        $host->name = $request->get('name');
-        $host->email = $request->get('email');
-        $host->gender = $request->get('gender');
-        $host->save();
-        return response()->json(['Created successfuly'], 200);
+        $request->validate([
+            'name' => 'required',
+            'email' => 'required',
+            'gender' => 'required'
+        ]);
+
+        $user = new Host;
+        $user->name = $request->get('name');
+        $user->email = $request->get('email');
+        $user->gender = $request->get('gender');
+        $user->save();
+        return to_route('users.index');
     }
 
     /**
@@ -63,7 +71,8 @@ class HostController extends Controller
      */
     public function show($id)
     {
-        return response()->json(['error' => 'Method Not Allowed'], 405);
+        $user = Host::find($id);
+        return response($user);
 
     }
 
@@ -75,7 +84,9 @@ class HostController extends Controller
      */
     public function edit($id)
     {
-        return response()->json(['error' => 'Method Not Allowed'], 405);
+        $user = Host::find($id);
+
+        return view('user.edit', compact('user'));
 
     }
 
@@ -88,7 +99,18 @@ class HostController extends Controller
      */
     public function update(Request $request, $id)
     {
-        return response()->json(['error' => 'Method Not Allowed'], 405);
+        $request->validate([
+            'name' => 'required',
+            'email' => 'required',
+            'gender' => 'required'
+        ]);
+        $user = Host::find($id);
+        $user->name = $request->get('name');
+        $user->email = $request->get('email');
+        $user->gender = $request->get('gender');
+        $user->save();
+        return to_route('users.index');
+
 
     }
 
@@ -105,6 +127,6 @@ class HostController extends Controller
             return response()->json(['error' => 'Not Found'], 404);
         }
         $host->delete();
-        return response()->json(['Deleted successfuly'], 200);
+        return to_route('users.index');
     }
 }

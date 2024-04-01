@@ -1,0 +1,28 @@
+.create {
+    padding: 10px;
+    margin: 4px;
+}
+
+.right {
+    float: right;
+}
+
+.d-flex {
+    justify-content: center;
+}
+
+.d-grid {
+    display: grid;
+}
+
+.js-right {
+    justify-self: right;
+}
+
+.red {
+    color: red;
+}
+
+.jc-end {
+    justify-content: end;
+}
